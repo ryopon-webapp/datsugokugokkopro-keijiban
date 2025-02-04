@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脱獄ごっこPRO掲示板</title>
+</head>
+<body>
+    <div class="container">
+        <h1>脱獄ごっこPRO掲示板</h1>
+        <div class="post-form">
+            <input type="text" id="userName" placeholder="ニックネーム" required>
+
+            <textarea id="postContent" placeholder="投稿内容" required></textarea>
+
+            <button id="submitPost">投稿する</button>
+        </div>
+        
+        <div class="posts">
+            <h2>投稿一覧</h2>
+            <div id="postsList"></div>
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.post-form {
+    margin-bottom: 20px;
+}
+
+input {
+    width: 1350px;
+    height: 50px;
+}
+
+textarea {
+    width: 1337px; /* 横幅を300pxに設定 */
+    height: 80px; /* 高さを100pxに設定 */
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none; /* リサイズできないようにする */
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #0000ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0000ff;
+}
+
+.posts {
+    margin-top: 20px;
+}
+
+.post {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+</style>
+
+<script>
+    document.getElementById("submitPost").addEventListener("click", function() {
+    let userName = document.getElementById("userName").value.trim();
+    let postContent = document.getElementById("postContent").value.trim();
+
+    if (userName === "" || postContent === "") {
+        alert("名前と投稿内容を入力してください");
+        return;
+    }
+
+    // Google Apps ScriptのWebアプリURL
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxL8HpRD7akeMsP7X6ibsNKImgDfFthR1uCFPkK_u7pmzZ2TDj6zSj_ks5VbnCScNSQUQ/exec'; // ここに実際のURLを貼り付け
+
+    // POSTリクエストを送る
+    fetch(scriptUrl, {
+        method: 'POST',
+        body: new URLSearchParams({
+            'userName': userName,
+            'content': postContent
+        })
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data); // 成功メッセージ
+        loadPosts(); // 新しい投稿後に掲示板を再読み込み
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+    // 入力フォームを空にする
+    document.getElementById("userName").value = "";
+    document.getElementById("postContent").value = "";
+});
+
+// ページ読み込み時に掲示板の投稿を表示する
+function loadPosts() {
+    // Google Apps ScriptのWebアプリURL
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxL8HpRD7akeMsP7X6ibsNKImgDfFthR1uCFPkK_u7pmzZ2TDj6zSj_ks5VbnCScNSQUQ/exec'; // ここに実際のURLを貼り付け
+
+    fetch(scriptUrl)
+        .then(response => response.json())
+        .then(posts => {
+            let postsList = document.getElementById("postsList");
+            postsList.innerHTML = ""; // 一度クリアしてから再描画
+
+            posts.forEach(post => {
+                let postElement = document.createElement("div");
+                postElement.classList.add("post");
+                postElement.textContent = `${post.userName}: ${post.content}`;
+                postsList.appendChild(postElement);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+// ページが読み込まれたら掲示板を表示
+window.onload = loadPosts;
+</script>
